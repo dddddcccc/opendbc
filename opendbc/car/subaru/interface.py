@@ -5,6 +5,10 @@ from opendbc.car.subaru.carcontroller import CarController
 from opendbc.car.subaru.carstate import CarState
 from opendbc.car.subaru.values import CAR, GLOBAL_ES_ADDR, SubaruFlags, SubaruSafetyFlags
 
+# Angle-based LKAS platforms allowed to control (non-release builds only, safety angle mode needs ALLOW_DEBUG).
+# SUBARU_OUTBACK_2023 also covers the 2022 Asia-Pacific/Australian Outback (same BT body, Subaru D harness).
+LKAS_ANGLE_CONTROL_CARS = (CAR.SUBARU_CROSSTREK_2025, CAR.SUBARU_OUTBACK_2023)
+
 
 class CarInterface(CarInterfaceBase):
   CarState = CarState
@@ -20,7 +24,7 @@ class CarInterface(CarInterfaceBase):
     # - proper panda safety setup (use the correct cruise_activated bit, throttle from Throttle_Hybrid, etc)
     ret.dashcamOnly = bool(ret.flags & (SubaruFlags.PREGLOBAL | SubaruFlags.HYBRID))
     if ret.flags & SubaruFlags.LKAS_ANGLE:
-      ret.dashcamOnly = is_release or candidate != CAR.SUBARU_CROSSTREK_2025
+      ret.dashcamOnly = is_release or candidate not in LKAS_ANGLE_CONTROL_CARS
     ret.autoResumeSng = False
 
     # Detect infotainment message sent from the camera
@@ -109,7 +113,9 @@ class CarInterface(CarInterfaceBase):
   @staticmethod
   def _get_params_sp(stock_cp: structs.CarParams, ret: structs.CarParamsSP, candidate, fingerprint: dict[int, dict[int, int]],
                      car_fw: list[structs.CarParams.CarFw], alpha_long: bool, is_release_sp: bool, docs: bool) -> structs.CarParamsSP:
-    stock_cp.dashcamOnly = bool(stock_cp.flags & (SubaruFlags.LKAS_ANGLE | SubaruFlags.HYBRID))
+    stock_cp.dashcamOnly = bool(stock_cp.flags & SubaruFlags.HYBRID)
+    if stock_cp.flags & SubaruFlags.LKAS_ANGLE:
+      stock_cp.dashcamOnly = is_release_sp or candidate not in LKAS_ANGLE_CONTROL_CARS
 
     if not stock_cp.flags & (SubaruFlags.GLOBAL_GEN2 | SubaruFlags.HYBRID):
       stock_cp.autoResumeSng = True
