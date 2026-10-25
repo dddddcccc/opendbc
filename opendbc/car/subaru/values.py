@@ -210,7 +210,9 @@ class CAR(Platforms):
   )
   SUBARU_OUTBACK_2023 = SubaruGen2PlatformConfig(
     [SubaruCarDocs("Subaru Outback 2023", "All", car_parts=CarParts.common([CarHarness.subaru_d]))],
-    SUBARU_OUTBACK.specs,
+    # manufacturer wheelbase and steer ratio for the 2023+ (and 2022 Asia-Pacific) Outback; the 2020-22
+    # torque Outback's steerRatio=17 overstated it by ~25%. Safety limits stay pinned to get_safety_CP().
+    CarSpecs(wheelbase=2.75, steerRatio=13.5),
     flags=SubaruFlags.LKAS_ANGLE,
   )
   SUBARU_ASCENT_2023 = SubaruGen2PlatformConfig(

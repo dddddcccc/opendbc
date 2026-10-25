@@ -253,22 +253,17 @@ FW_VERSIONS = {
       b'\xf4!`0\x07',
     ],
   },
-  # Also matches the 2022 Asia-Pacific (Taiwan) Outback: angle-based EyeSight that reports only
-  # abs, fwdCamera and engine (no eps/transmission), driven on this platform's parameters.
   CAR.SUBARU_CROSSTREK_2025: {
     (Ecu.abs, 0x7b0, None): [
-      b'\xa1 !w\x03',
       b'\xa2 $\x15\x05',
       b'\xa2 $\x17\x06',
     ],
     (Ecu.fwdCamera, 0x787, None): [
-      b'\x06!\x00\x04+\x03!\x00\x04(',
       b'\x1d!\x08\x00F\x14!\x08\x00=',
       b'\x1d!\x08\x00F\x00\x00\x00\x00\x00',
       b'\x1b!\x08\x00D\x11!\x08\x01;',
     ],
     (Ecu.engine, 0x7a2, None): [
-      b'\xe1\x9a`@\x07',
       b'\x04"cP\x07',
       b'\x04"bp\x07',
       b'\xe8!cp\x07',
@@ -587,8 +582,11 @@ FW_VERSIONS = {
       b'\x1f\xf6B1\x00',
     ],
   },
+  # Includes the 2022 Asia-Pacific (Taiwan) Outback: angle-based EyeSight, Subaru D harness.
+  # It only answers on abs, fwdCamera and engine; eps is non-essential on GEN2 and transmission isn't essential.
   CAR.SUBARU_OUTBACK_2023: {
     (Ecu.abs, 0x7b0, None): [
+      b'\xa1 !w\x03',
       b'\xa1 #\x14\x00',
       b'\xa1 #\x17\x00',
     ],
@@ -597,9 +595,11 @@ FW_VERSIONS = {
       b'+\xc0\x12\x11\x00',
     ],
     (Ecu.fwdCamera, 0x787, None): [
+      b'\x06!\x00\x04+\x03!\x00\x04(',
       b'\t!\x08\x046\x05!\x08\x01/',
     ],
     (Ecu.engine, 0x7a2, None): [
+      b'\xe1\x9a`@\x07',
       b'\xed,\xa0q\x07',
       b'\xed,\xa2q\x07',
     ],
