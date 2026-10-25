@@ -6,8 +6,9 @@ from opendbc.car.subaru.carstate import CarState
 from opendbc.car.subaru.values import CAR, GLOBAL_ES_ADDR, SubaruFlags, SubaruSafetyFlags
 
 # Angle-based LKAS platforms allowed to control (non-release builds only, safety angle mode needs ALLOW_DEBUG).
-# SUBARU_OUTBACK_2023 also covers the 2022 Asia-Pacific/Australian Outback (same BT body, Subaru D harness).
-LKAS_ANGLE_CONTROL_CARS = (CAR.SUBARU_CROSSTREK_2025, CAR.SUBARU_OUTBACK_2023)
+# Only the platform validated on this car: SUBARU_OUTBACK_2023, which also covers the 2022 Asia-Pacific
+# Outback (same BT body, Subaru D harness). Every other angle platform stays in dashcam mode.
+LKAS_ANGLE_CONTROL_CARS = (CAR.SUBARU_OUTBACK_2023,)
 
 
 class CarInterface(CarInterfaceBase):
