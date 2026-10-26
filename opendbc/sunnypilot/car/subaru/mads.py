@@ -45,4 +45,11 @@ class MadsCarState(MadsCarStateBase):
     if not self.CP.flags & SubaruFlags.PREGLOBAL:
       self.lkas_button = cp_cam.vl["ES_LKAS_State"]["LKAS_Dash_State"]
 
+    # LKAS_ANGLE cars: the LKAS button also toggles EyeSight's own lane keep, and pressing it with the C4
+    # running has faulted EyeSight/RAB on a 2022 Asia-Pacific Outback. Ignore it so MADS lateral is driven
+    # only by ACC main (and brake / ACC main off to disengage). openpilot-side only; panda safety unchanged.
+    if self.CP.flags & SubaruFlags.LKAS_ANGLE:
+      ret.buttonEvents = []
+      return
+
     ret.buttonEvents = self.create_lkas_button_events(self.lkas_button, self.prev_lkas_button, {1: ButtonType.lkas})
