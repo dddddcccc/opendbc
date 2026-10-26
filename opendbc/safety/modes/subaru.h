@@ -61,9 +61,12 @@
   {.msg = {{cruise_msg,                alt_bus,         8, 20U, .max_counter = 15U, .ignore_quality_flag = true}, { 0 }, { 0 }}},  \
   {.msg = {{MSG_SUBARU_ES_LKAS_State,   SUBARU_CAM_BUS,  8, 10U, .max_counter = 15U, .ignore_quality_flag = true}, { 0 }, { 0 }}},  \
 
+// ES_DashStatus carries Cruise_On (ACC main) for LKAS_ANGLE cars, the same source carstate uses for
+// cruiseState.available, so MADS sees the same ACC main edges on both sides.
 #define SUBARU_LKAS_ANGLE_RX_CHECKS(alt_bus) \
   SUBARU_COMMON_RX_CHECKS(alt_bus, MSG_SUBARU_ES_Status) \
   {.msg = {{MSG_SUBARU_Steering_2,      SUBARU_MAIN_BUS, 8, 50U, .max_counter = 15U, .ignore_quality_flag = true}, { 0 }, { 0 }}},  \
+  {.msg = {{MSG_SUBARU_ES_DashStatus,   SUBARU_CAM_BUS,  8, 10U, .max_counter = 15U, .ignore_quality_flag = true}, { 0 }, { 0 }}},  \
 
 static bool subaru_gen2 = false;
 static bool subaru_lkas_angle = false;
@@ -113,6 +116,13 @@ static void subaru_rx_hook(const CANPacket_t *msg) {
   if (subaru_lkas_angle && msg_matches(msg, MSG_SUBARU_ES_Status, alt_main_bus)) {
     bool cruise_engaged = GET_BIT(msg, 29U);
     pcm_cruise_check(cruise_engaged);
+  }
+  // LKAS_ANGLE cars don't use CruiseControl, so take ACC main from ES_DashStatus->Cruise_On like carstate.
+  // Without this acc_main_on stays false: openpilot's MADS engages lateral on the ACC main rising edge
+  // but panda never allows it, every steering frame gets blocked, and the EPS faults (Steer_Error_1),
+  // taking EyeSight and RAB down with it.
+  if (subaru_lkas_angle && msg_matches(msg, MSG_SUBARU_ES_DashStatus, SUBARU_CAM_BUS)) {
+    acc_main_on = GET_BIT(msg, 49U);
   }
   if (!subaru_lkas_angle && msg_matches(msg, MSG_SUBARU_CruiseControl, alt_main_bus)) {
     bool cruise_engaged = (msg->data[5] >> 1) & 1U;
